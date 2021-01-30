@@ -6,8 +6,53 @@
         <link rel="stylesheet" href="../css/styles.css">
     </head>
     <body>
-        <main>
-            <div></div>
-        </main>
+        <script type="module">
+            import * as THREE from 'https://unpkg.com/three@0.125.2/build/three.module.js';
+            import {OrbitControls} from 'https://unpkg.com/three@0.125.2/examples/jsm/controls/OrbitControls.js';
+            import {GLTFLoader} from 'https://unpkg.com/three@0.125.2/examples/jsm/loaders/GLTFLoader.js';
+            
+            // Scene, camera & renderer
+            const scene = new THREE.Scene();
+			scene.background = new THREE.Color(0xffffff);
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+            camera.position.set(7, 3, 9);
+
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            
+            // Controls
+            let controls = new OrbitControls(camera, renderer.domElement);
+            controls.update();
+
+            // Lights
+            const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
+            scene.add(hemisphereLight);
+            const directionalLight  = new THREE.DirectionalLight(0xffffff, 0.3);
+            directionalLight.position.set(0.5, 0, 0.866); // 60º
+            scene.add(directionalLight);
+
+            // GLTF Model
+            let loader = new GLTFLoader();
+            loader.load('../models/point_contained_in_a_plane.gltf', function (gltf) {
+                scene.add(gltf.scene);
+            });
+
+            // Resize
+            window.addEventListener('resize', function() {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.update();
+            });
+
+            // Animate
+            function animate() {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        </script>
     </body>
 </html>
